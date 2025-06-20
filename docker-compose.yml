@@ -1,0 +1,32 @@
+services:
+  throttr-server:
+    image: ghcr.io/throttr/throttr:${VERSION}-${BUILD_TYPE}-${VALUE_SIZE}-${ARCHITECTURE}-metrics-${METRICS}
+    container_name: throttr-server
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      - TZ=America/Santiago
+    networks:
+      - throttr-network
+
+  throttr-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    container_name: throttr-admin
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    environment:
+      - TZ=America/Santiago
+      - TAG=${ADMIN_VERSION}
+    depends_on:
+      - throttr-server
+    networks:
+      - throttr-network
+
+networks:
+  throttr-network:
+    driver: bridge
